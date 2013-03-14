@@ -1,0 +1,5 @@
+Gra T- move
+
+accel
+compass
+vibrate
