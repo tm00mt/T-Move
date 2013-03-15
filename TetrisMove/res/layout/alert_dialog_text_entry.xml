@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+            
+    <EditText
+        android:id="@+id/player_name"
+        android:layout_height="wrap_content"
+        android:layout_width="60px"
+        android:layout_marginLeft="120dip"
+        android:layout_marginRight="20dip"
+        android:scrollHorizontally="true"
+        android:autoText="false"
+        android:text="PLA"
+        android:capitalize="characters"
+        android:maxLength="3"
+        android:gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+</LinearLayout>
