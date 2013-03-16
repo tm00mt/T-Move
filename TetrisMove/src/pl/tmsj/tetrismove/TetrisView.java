@@ -19,6 +19,13 @@ public class TetrisView extends View implements ITetrisConstants {
     private Activity mActivityHandle; //save reference to activity to be able to quit from here
     private ScoreManager scoreManager;
     
+    //tabelę można wykorzystać do przechowywania ilości punktów, które trzeba zdobyć
+    //aby przejść do kolejnego levelu, poosiągnięciu ostatniego levelu trzeba dodać
+    //kolejne pole z ilością punktów
+    //levelBoundaries[currentLevel] - przechowuje punkty do levelu currentLevel + 1
+    //private int[] levelBoundaries = new int[]{20, 50, 100};
+    private int levelBoundary = 1;
+    
     
     //game specific
     private TetrisGrid grid; 			//game play field/grid
