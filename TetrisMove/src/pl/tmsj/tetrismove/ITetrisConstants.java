@@ -56,15 +56,14 @@ public interface ITetrisConstants {
 	public static final int HUD_TOP_SCORES_RANK_OFFSET = 45;
 	public static final int HUD_TOP_SCORES_WORD_OFFSET = 25;
 	
-	
-	
 	//PLAYFIELD
 	//grid size
 	public static final int PLAYFIELD_COLS = 12;
 	public static final int PLAYFIELD_ROWS = 18;
 	
 	//ticks before engine calls gravity
-	public static final int GRAVITY_RATE = (1000 / 2);
+	//prędkość początkowa spadających klocków (w milisekundach)
+	public static final int STARTING_GRAVITY_RATE = 1000;
 
 	//cell where new shapes apear
 	public static final int START_CELL		= (PLAYFIELD_COLS/2)-1;
@@ -96,13 +95,13 @@ public interface ITetrisConstants {
 	public static final int OR_WEST  = 3;
 	public static final int START_ORIENTATION = OR_EAST;
 	
-	
 	//max elems
 	public static final int ELEM_BASE = 0;
 	public static final int ELEM_1 	  = 1;
 	public static final int ELEM_2    = 2;
 	public static final int ELEM_3    = 3;
 	public static final int MAX_ELEMS = 4;
+	
 	//shape types
 	public static final int TYPE_LONG 		= 0;
 	public static final int TYPE_BL   		= 1;
@@ -112,6 +111,24 @@ public interface ITetrisConstants {
 	public static final int TYPE_BS 		= 5;
 	public static final int TYPE_T 			= 6;
 	public static final int TYPE_MAX_TYPES	= 7;
+	
+	//colors
+	public static final int COLOR_RED = Color.RED;
+	public static final int COLOR_BLUE = Color.BLUE;
+	public static final int COLOR_YELLOW = Color.YELLOW;
+	public static final int COLOR_GREEN = Color.GREEN;
+	public static final int COLOR_LIGHT_BLUE = Color.rgb(0,255,255);
+	public static final int COLOR_ORANGE = Color.rgb(255,150,0);
+	public static final int COLOR_EMPTY_BLOCK = Color.GRAY;
+	public static final int COLOR_BACKGROUND = COLOR_EMPTY_BLOCK;
+	public static final int[] BLOCK_COLORS = {
+		COLOR_RED,
+		COLOR_GREEN,
+		COLOR_BLUE,
+		COLOR_LIGHT_BLUE,
+		COLOR_ORANGE,
+		COLOR_YELLOW
+	};
 	
 	//TABLES
 	

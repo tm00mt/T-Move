@@ -9,6 +9,7 @@ public class TetrisShape implements ITetrisConstants {
 	
 	private int mOrient;
 	private int mType;
+	private int mColor;
 	private int mNextType;
 	public int getNextType(){return mNextType;}
 	private int mState;
@@ -22,6 +23,7 @@ public class TetrisShape implements ITetrisConstants {
 		mRand = new Random();
 		mElems = new int[MAX_ELEMS];
 		mNextType = mRand.nextInt(TYPE_MAX_TYPES);
+		mColor = BLOCK_COLORS[mRand.nextInt(BLOCK_COLORS.length)];
 	}
 	
 	public boolean spawn() {
@@ -31,6 +33,7 @@ public class TetrisShape implements ITetrisConstants {
 		}
 		mType = mNextType;
 		mNextType = mRand.nextInt(TYPE_MAX_TYPES);
+		mColor = BLOCK_COLORS[mRand.nextInt(BLOCK_COLORS.length)];
 		mElems[ELEM_BASE] = START_CELL;
 		mOrient = START_ORIENTATION;
 		mState = STATE_USER;
@@ -145,7 +148,7 @@ public class TetrisShape implements ITetrisConstants {
 	}
 	
 	private boolean tryToMove(int[] newElemPos) {
-		boolean hasMoved = mGrid.tryToMoveCells(mElems, newElemPos);
+		boolean hasMoved = mGrid.tryToMoveCells(mElems, newElemPos, mColor);
 		if(hasMoved)
 			mElems = newElemPos;
 		return hasMoved;

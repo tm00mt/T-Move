@@ -1,12 +1,15 @@
 package pl.tmsj.tetrismove;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
 public class TetrisGrid implements ITetrisConstants {
-	//false when empty-true when occupied
-    private boolean[] mCells;
+	//zawiera liczby określające kolor na jaki trzeba zamalować kratkę
+    private int[] mCells;
     private int mTileW;
     private int mTileH;
     private int mLeft;
@@ -15,14 +18,14 @@ public class TetrisGrid implements ITetrisConstants {
     private int mBottom;
     
     public TetrisGrid() {
-		mCells = new boolean[PLAYFIELD_ROWS*PLAYFIELD_COLS];
+		mCells = new int[PLAYFIELD_ROWS*PLAYFIELD_COLS];
 		init();
 	}
 
 	public void init() {
 		for(int i=0;i<mCells.length;i++)
 		{
-			mCells[i]=false;
+			mCells[i] = COLOR_EMPTY_BLOCK;
 		}
 	}
 	
@@ -72,10 +75,10 @@ public class TetrisGrid implements ITetrisConstants {
     
 	public boolean IsCellFree(int index)
 	{
-		if(IsCellValid(index))
-			return !mCells[index];
-		else
-			return false;
+		if (IsCellValid(index))
+			if (mCells[index] == COLOR_EMPTY_BLOCK)
+				return true;
+		return false;
 	}
 	
 	private boolean checkForRunOff(int[] from, int[] to) {
@@ -94,7 +97,7 @@ public class TetrisGrid implements ITetrisConstants {
 		return true;
 	}
 
-	public boolean tryToMoveCells(int[] from, int[] to) {
+	public boolean tryToMoveCells(int[] from, int[] to, int color) {
 		
 		//test grid
 		if(!checkForRunOff(from,to))
@@ -115,12 +118,13 @@ public class TetrisGrid implements ITetrisConstants {
 		{
 			for (int i = 0; i < from.length; i++) {
 				if(IsCellValid(from[i]))
-					mCells[from[i]] = false;
+					mCells[from[i]] = COLOR_EMPTY_BLOCK;
 			}
+			
 			for (int i = 0; i < to.length; i++) {
 				boolean cellAboveGrid = to[i] < 0; //can happen on init
 				if(!cellAboveGrid)
-					mCells[to[i]] = true;
+					mCells[to[i]] = color;
 			}
 		}
 		
@@ -129,27 +133,36 @@ public class TetrisGrid implements ITetrisConstants {
 
 	public void paint(Canvas canvas, Paint paint) {
 		//paint bg
-		paint.setColor(Color.GRAY);
+		paint.setColor(COLOR_BACKGROUND);
 		paint.setStyle(Paint.Style.FILL);
 		canvas.drawRect(mLeft, mTop, mRight, mBottom, paint);
 
-		
 		//paint elems
 		int l,t,r,b;
 		for(int i=0;i<mCells.length;i++)
 		{
+			//obliczam wymiary każdego kwadratu na planszy
 			l = mLeft+(i%PLAYFIELD_COLS)*mTileW;
 			t = mTop+(i/PLAYFIELD_COLS)*mTileH;
 			r = l+mTileW;
 			b = t+mTileH;
-			paint.setColor(Color.YELLOW);
-			paint.setStyle((mCells[i])?Paint.Style.FILL:Paint.Style.STROKE);
+			
+			//malowanie pojedynczego kwadratu w odpowiednim kolorze
+			paint.setColor(mCells[i]);
+			paint.setStyle(Paint.Style.FILL);
 			canvas.drawRect(l, t, r, b, paint);
-			//if(mCells[i])//more fancy graphics for occupied cells
+			//jeśli kratka jest pusta to rysuję siatkę
+			if (mCells[i] == COLOR_EMPTY_BLOCK) {
+				paint.setColor(Color.WHITE);
+				paint.setStyle(Paint.Style.STROKE);
+				canvas.drawRect(l, t, r, b, paint);
+			}
+			
+			if(mCells[i] != COLOR_EMPTY_BLOCK)//more fancy graphics for occupied cells
 			{
-				//paint.setColor(Color.BLACK);
-				//paint.setStyle(Paint.Style.STROKE);
-				//canvas.drawRect(l+2, t+2, r-2, b-2, paint);
+				paint.setColor(Color.BLACK);
+				paint.setStyle(Paint.Style.STROKE);
+				canvas.drawRect(l+2, t+2, r-2, b-2, paint);
 			}
 		}
 
@@ -161,14 +174,13 @@ public class TetrisGrid implements ITetrisConstants {
 	public int update() {
 		int points = 0;
 		for (int row =  PLAYFIELD_ROWS-1; row >= 0; row--) {
-			if(CheckRowForSame(row, false))
+			if (IsRowEmpty(row))
 				break;
-			if(CheckRowForSame(row, true))
-			{
+			if (CheckRowForLine(row)) {
 				points++;
-				SetAllRowTo(row, false);
+				ClearRow(row);
 				MakeGridCollapse(row-1);
-				row++;//we collapsed grid onto this row so we need to check it again by cancelling the upcomming decrement
+				row++;
 			}
 		}
 		return points;
@@ -176,33 +188,49 @@ public class TetrisGrid implements ITetrisConstants {
 
 	private void MakeGridCollapse(int row) {
 		for (int r =  row; r >= 0; r--) {
-			if(CheckRowForSame(r, false))
+			if(IsRowEmpty(r))
 				break;
 			ShiftRowBy(r,C_DOWN);
-			SetAllRowTo(r, false);
+			ClearRow(r);
 		}
 	}
+	
 
 	private void ShiftRowBy(int row, int down) {
 		int index;
 		for (int i = 0; i < PLAYFIELD_COLS; i++) {
 			index = (row*PLAYFIELD_COLS)+i;
-			mCells[index+ down] = mCells[index];
+			mCells[index+down] = mCells[index];			
 		}
 		
 	}
 
-	private void SetAllRowTo(int row, boolean b) {
+	private void ClearRow(int row) {
 		for (int i = 0; i < PLAYFIELD_COLS; i++) {
-			mCells[(row*PLAYFIELD_COLS)+i] = b;
+			mCells[(row*PLAYFIELD_COLS)+i] = COLOR_EMPTY_BLOCK;
 		}
 	}
-
-	private boolean CheckRowForSame(int row, boolean b) {
+	
+	private boolean CheckRowForLine(int row) {
+		boolean isLine = true;
 		for (int i = 0; i < PLAYFIELD_COLS; i++) {
-			if( mCells[(row*PLAYFIELD_COLS)+i] != b )
-				return false;
+			if (mCells[(row*PLAYFIELD_COLS)+i] == COLOR_EMPTY_BLOCK) {
+				isLine = false;
+				break;
+			}
 		}
-		return true;
+		return isLine;
 	}
+	
+	private boolean IsRowEmpty(int row) {
+		boolean isEmpty = true;
+		for (int i = 0; i < PLAYFIELD_COLS; i++) {
+			if (mCells[(row*PLAYFIELD_COLS)+i] != COLOR_EMPTY_BLOCK) {
+				isEmpty = false;
+				break;
+			}
+		}
+		return isEmpty;
+	}
+	
 }

@@ -20,11 +20,20 @@ public class TetrisHud implements ITetrisConstants {
 		paint.setColor(HUD_SCORE_NUM_COLOR);
 		canvas.drawText(""+s.currentScore, x, y, paint);
 		
+		//level
+		y+=HUD_SCORE_INTERLINE;
+		paint.setColor(HUD_SCORE_WORD_COLOR);
+		canvas.drawText("Level", x, y, paint);
+		y+=HUD_SCORE_INTERLINE;
+		paint.setColor(HUD_SCORE_NUM_COLOR);
+		canvas.drawText(""+s.currentLevel, x, y, paint);
+		
 		//next shape
 		displayNextShape(canvas, paint, right, top, Align.RIGHT, nextType);
 
 		//top scores
-		displayTopScores(canvas, paint, s.getTopScores(), right, top, Align.RIGHT);
+		//zakomentowałem wyświetlanie listy najlepszych wyników
+		//displayTopScores(canvas, paint, s.getTopScores(), right, top, Align.RIGHT);
 		
 		//normal align
 		paint.setTextAlign(Align.LEFT);
@@ -32,16 +41,19 @@ public class TetrisHud implements ITetrisConstants {
 	
 	public static void displayNextShape(Canvas canvas, Paint mPaint, int startX, int startY, Align a, int nextType ){
 		int tmpX,tmpY,offset;
+		//zmienna odpowiadająca za to, o ile w dół trzeba przesunąć kształt kolejnego
+		//klocka aby nie zasłaniał pola z numerem bieżącego levelu
+		int myOffsetForLevel = 40;
 		int i = 0;
 		int x = startX-HUD_NEXT_TEXT_OFFSET;
-		int y = startY+MARGIN_TOP+HUD_NEXT_WORD_Y_START;
-
+		int y = startY+MARGIN_TOP+HUD_NEXT_WORD_Y_START + myOffsetForLevel;
+		
 		mPaint.setTextAlign(a);
 		mPaint.setColor(HUD_NEXT_WORD_COLOR);
 		canvas.drawText("Next", x, y, mPaint);
 		mPaint.setColor(HUD_NEXT_SHAPE_COLOR);
 		x = startX - HUD_NEXT_SHAPE_X_START;
-		y = startY+MARGIN_TOP+HUD_NEXT_SHAPE_Y_START;
+		y = startY+MARGIN_TOP+HUD_NEXT_SHAPE_Y_START + myOffsetForLevel;
 		tmpX = x;
 		tmpY = y;
 		offset = (nextType*SHAPE_TABLE_TYPE_OFFSET)+START_ORIENTATION*SHAPE_TABLE_ELEMS_PER_ROW;

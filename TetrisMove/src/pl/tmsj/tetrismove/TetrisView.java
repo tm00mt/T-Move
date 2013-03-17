@@ -1,11 +1,15 @@
 package pl.tmsj.tetrismove;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class TetrisView extends View implements ITetrisConstants {
 	//members
@@ -19,12 +23,16 @@ public class TetrisView extends View implements ITetrisConstants {
     private Activity mActivityHandle; //save reference to activity to be able to quit from here
     private ScoreManager scoreManager;
     
+    SoundPool shortSounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+    private int lineDeleted = shortSounds.load(getContext(), R.raw.bomb, 1);
+    
     //tabelę można wykorzystać do przechowywania ilości punktów, które trzeba zdobyć
     //aby przejść do kolejnego levelu, poosiągnięciu ostatniego levelu trzeba dodać
     //kolejne pole z ilością punktów
     //levelBoundaries[currentLevel] - przechowuje punkty do levelu currentLevel + 1
     //private int[] levelBoundaries = new int[]{20, 50, 100};
-    private int levelBoundary = 1;
+    private int levelBoundary = 5;
+    private int currentGravityRate = STARTING_GRAVITY_RATE;
     
     
     //game specific
@@ -63,7 +71,7 @@ public class TetrisView extends View implements ITetrisConstants {
 
 		grid.init();
 		
-		scoreManager.currentScore = 1;
+		scoreManager.currentScore = 0;
 		scoreManager.scoreWasSaved = false;
 	}
 
@@ -72,11 +80,11 @@ public class TetrisView extends View implements ITetrisConstants {
 		currentShape.isGameOver = false;
 	}
 
-
+	
 	public void quitGame() {
 		mActivityHandle.finish();
 	}
-	
+		
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		grid.setBackGroundDimentions(w, h);
@@ -130,7 +138,6 @@ public class TetrisView extends View implements ITetrisConstants {
 	
 	public void update() {
 		long time = System.currentTimeMillis();
-
 		
 		if( mHasFocus )
 		{
@@ -147,27 +154,43 @@ public class TetrisView extends View implements ITetrisConstants {
 			//normal state
 			else if( time > mNextUpdate )
 			{
+				
 				mNextUpdate = time + 1000 / FRAME_RATE;
 				mTicks++;
 				currentShape.update(currentAction);
 				currentAction = ACTION_NONE;
-				if(time - mLastGravity > GRAVITY_RATE || currentShape.IsFalling())
+				if(time - mLastGravity > currentGravityRate || currentShape.IsFalling())
 				{
 					mLastGravity = time;
 					boolean shapeIsLocked = currentShape.addGravity();
+					
 					if(shapeIsLocked)
 					{
 						int points = grid.update();
 						if(points != 0)
-							scoreManager.currentScore += points;
+							//odtwarzam krótki dźwięk po skazowaniu linii
+							if (lineDeleted != 0)
+								shortSounds.play(lineDeleted, 1, 1, 0, 0, 1);
+							//premia za jednoczesne skasowanie trzech lub czterech linii
+							if (points > 2)
+								points *= 2;
+							scoreManager.currentScore += points * scoreManager.currentLevel;
 					}
+					
+					if (scoreManager.currentScore >= levelBoundary) {
+						scoreManager.currentLevel++;
+						levelBoundary *= 2;
+						//przyśpieszam spadanie klocków o 100 ms
+						currentGravityRate -= 100;
+					}
+					
 				}
-				
 				if(mTicks/FRAME_RATE > mSeconds)
 				{
 					mSeconds = mTicks/FRAME_RATE;
 				}
 			}
+			
 		}
 		else
 		{
@@ -175,6 +198,7 @@ public class TetrisView extends View implements ITetrisConstants {
 			mNextUpdate = time + (1000 / OUT_OF_PAUSE_DELAY);
 		}
 		return;
+		
 	}
 	
 	@Override
@@ -200,4 +224,5 @@ public class TetrisView extends View implements ITetrisConstants {
 		if(saveToDB && player != null )
 				scoreManager.saveScoreIfTopScore(player);
 	}
+	
 }
