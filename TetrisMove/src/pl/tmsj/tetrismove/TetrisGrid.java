@@ -1,8 +1,5 @@
 package pl.tmsj.tetrismove;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;

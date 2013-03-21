@@ -1,7 +1,7 @@
 package pl.tmsj.tetrismove;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,7 +9,6 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Toast;
 
 public class TetrisView extends View implements ITetrisConstants {
 	//members
@@ -22,9 +21,11 @@ public class TetrisView extends View implements ITetrisConstants {
     private Paint mPaint;		//paint object to use in draws.
     private Activity mActivityHandle; //save reference to activity to be able to quit from here
     private ScoreManager scoreManager;
-    
-    SoundPool shortSounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
-    private int lineDeleted = shortSounds.load(getContext(), R.raw.bomb, 1);
+
+    public static SoundPool shortSounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+    int[] soundsId = new int[]{0,0};
+	SharedPreferences sharedPreferences;
+    public static int lineDeletedSoundId = 0;
     
     //tabelę można wykorzystać do przechowywania ilości punktów, które trzeba zdobyć
     //aby przejść do kolejnego levelu, poosiągnięciu ostatniego levelu trzeba dodać
@@ -43,6 +44,10 @@ public class TetrisView extends View implements ITetrisConstants {
 	public TetrisView(Activity context) {
 		//init view obj
 		super(context);
+		
+		//pobieram do tablicy kolejne dźwięki
+	    soundsId[1] = shortSounds.load(context, R.raw.bomb, 1);
+		
 		mActivityHandle = context;
 		setBackgroundColor(Color.BLACK);
 		setFocusable(true);
@@ -120,7 +125,8 @@ public class TetrisView extends View implements ITetrisConstants {
 				case KeyEvent.KEYCODE_DPAD_DOWN:
 				case KeyEvent.KEYCODE_8:
 				{
-					currentAction = ACTION_ROTATE_R;
+//					currentAction = ACTION_ROTATE_R;
+					currentAction = ACTION_STRAFE_DOWN;
 					break;
 				}
 				case KeyEvent.KEYCODE_5:
@@ -167,14 +173,17 @@ public class TetrisView extends View implements ITetrisConstants {
 					if(shapeIsLocked)
 					{
 						int points = grid.update();
-						if(points != 0)
+						if(points != 0) {
 							//odtwarzam krótki dźwięk po skazowaniu linii
-							if (lineDeleted != 0)
-								shortSounds.play(lineDeleted, 1, 1, 0, 0, 1);
+							if (lineDeletedSoundId != 0)
+								shortSounds.play(lineDeletedSoundId, 1, 1, 0, 0, 1);
+							//zliczam ilość skasowanych wierszy
+							scoreManager.linesDeleted += points;
 							//premia za jednoczesne skasowanie trzech lub czterech linii
 							if (points > 2)
 								points *= 2;
 							scoreManager.currentScore += points * scoreManager.currentLevel;
+						}
 					}
 					
 					if (scoreManager.currentScore >= levelBoundary) {

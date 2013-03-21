@@ -14,6 +14,7 @@ public class GenericMenu {
 
 		mMenu.add("Resume");
 		mMenu.add("Restart");
+		mMenu.add("Music");
 		mMenu.add("Quit");
 	}
 }

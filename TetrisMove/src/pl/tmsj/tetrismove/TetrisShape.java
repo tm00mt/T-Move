@@ -70,6 +70,12 @@ public class TetrisShape implements ITetrisConstants {
 					mState = STATE_FALLING;
 					break;
 				}
+//
+				case ACTION_STRAFE_DOWN:
+				{
+					shiftCells(C_DOWN);
+					break;
+				}
 			}
 		}
 	}

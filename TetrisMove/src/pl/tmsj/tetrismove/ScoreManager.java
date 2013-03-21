@@ -14,6 +14,7 @@ public class ScoreManager {
     public static final int TOP_SCORE_NB = 10;
     
     public int currentLevel = 1;
+    public int linesDeleted = 0;
 	public int currentScore;
 	private Context ctx;
 	private ScoreDBHelper helper;
