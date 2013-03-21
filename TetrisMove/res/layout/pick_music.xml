@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tvSelectMusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_music" />
+
+    <RadioGroup
+        android:id="@+id/rgMusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/rbMusicOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/music_off" />
+
+        <RadioButton
+            android:id="@+id/rbTetrisTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/original_tetris_theme" />
+
+        <RadioButton
+            android:id="@+id/rbTetrisMix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tetris_party_mix" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tvSelectSound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/delete_line_sound" />
+
+    <RadioGroup
+        android:id="@+id/rgSound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/rbSoundOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sound_off" />
+
+        <RadioButton
+            android:id="@+id/rbExplosion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/explosion_sound" />
+    </RadioGroup>
+
+</LinearLayout>
