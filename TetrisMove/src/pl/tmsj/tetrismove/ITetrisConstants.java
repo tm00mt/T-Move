@@ -24,6 +24,8 @@ public interface ITetrisConstants {
 	public static final int ACTION_ROTATE_L = 3;
 	public static final int ACTION_ROTATE_R = 4;
 	public static final int ACTION_MAKE_FALL = 5;
+//
+	public static final int ACTION_STRAFE_DOWN = 6;
 	
 	//HUD
 	//does playfield leave space for a margin

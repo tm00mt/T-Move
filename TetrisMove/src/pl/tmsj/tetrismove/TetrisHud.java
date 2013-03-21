@@ -20,6 +20,14 @@ public class TetrisHud implements ITetrisConstants {
 		paint.setColor(HUD_SCORE_NUM_COLOR);
 		canvas.drawText(""+s.currentScore, x, y, paint);
 		
+		//lines
+		y+=HUD_SCORE_INTERLINE;
+		paint.setColor(HUD_SCORE_WORD_COLOR);
+		canvas.drawText("Lines", x, y, paint);
+		y+=HUD_SCORE_INTERLINE;
+		paint.setColor(HUD_SCORE_NUM_COLOR);
+		canvas.drawText(""+s.linesDeleted, x, y, paint);
+		
 		//level
 		y+=HUD_SCORE_INTERLINE;
 		paint.setColor(HUD_SCORE_WORD_COLOR);
@@ -43,7 +51,7 @@ public class TetrisHud implements ITetrisConstants {
 		int tmpX,tmpY,offset;
 		//zmienna odpowiadająca za to, o ile w dół trzeba przesunąć kształt kolejnego
 		//klocka aby nie zasłaniał pola z numerem bieżącego levelu
-		int myOffsetForLevel = 40;
+		int myOffsetForLevel = 80;
 		int i = 0;
 		int x = startX-HUD_NEXT_TEXT_OFFSET;
 		int y = startY+MARGIN_TOP+HUD_NEXT_WORD_Y_START + myOffsetForLevel;
