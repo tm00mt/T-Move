@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class TetrisView extends View implements ITetrisConstants {
@@ -34,7 +35,7 @@ public class TetrisView extends View implements ITetrisConstants {
     //private int[] levelBoundaries = new int[]{20, 50, 100};
     private int levelBoundary = 5;
     private int currentGravityRate = STARTING_GRAVITY_RATE;
-    
+    float touchDownX, touchDownY, touchUpX, touchUpY;
     
     //game specific
     private TetrisGrid grid; 			//game play field/grid
@@ -78,6 +79,7 @@ public class TetrisView extends View implements ITetrisConstants {
 		
 		scoreManager.currentScore = 0;
 		scoreManager.scoreWasSaved = false;
+        touchDownX = touchDownY = touchUpX = touchUpY = 0;
 	}
 
 	public void restartGame() {
@@ -155,7 +157,6 @@ public class TetrisView extends View implements ITetrisConstants {
 					int alertType = (scoreManager.isTopScore() && !scoreManager.scoreWasSaved)? AlertManager.TYPE_TOP_SCORE:AlertManager.TYPE_GAME_OVER;
 					AlertManager.PushAlert(this, alertType);
 				}
-
 			}
 			//normal state
 			else if( time > mNextUpdate )
@@ -232,6 +233,47 @@ public class TetrisView extends View implements ITetrisConstants {
 		scoreManager.scoreWasSaved = true;
 		if(saveToDB && player != null )
 				scoreManager.saveScoreIfTopScore(player);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// Ustawianie FPS przez co aplikacja będzie się wolniej odświeżała
+		// (metoda onTouchEvent będzie się dłużej/rzadziej wykonywała)
+		// przez co może nieco płynniej działać, bo procesor będzie mniej obciążony
+		try {
+			// Zatrzymanie wątku na 50 ms co daje
+			// 1000 ms / 50 ms = 20 FPS
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			touchDownX = event.getX();
+			touchDownY = event.getY();
+			break;
+		case MotionEvent.ACTION_UP:
+			touchUpX = event.getX();
+			touchUpY = event.getY();
+			
+			//sprawdzam, czy ruch palca był dłuższy w pionie czy w poziomie
+			if (Math.abs(touchDownX-touchUpX) > Math.abs(touchDownY-touchUpY)) {
+				//gdy ruch był "bardziej poziomy" to przesuwam klocek w lewo lub w prawo
+				if (touchDownX > touchUpX)
+					currentAction = ACTION_STRAFE_LEFT;
+				else
+					currentAction = ACTION_STRAFE_RIGHT;
+			} else {
+				//gdy ruch był "bardziej pionowy" to obracam klocek lub przesuwam w dół
+				if (touchDownY > touchUpY)
+					currentAction = ACTION_ROTATE_L;
+				else
+					currentAction = ACTION_STRAFE_DOWN;
+			}
+			break;
+		}
+		return true;
 	}
 	
 }
